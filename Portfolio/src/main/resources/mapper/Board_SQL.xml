@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeon.Portfolio.board.service.impl.BoardMapper">
+
+	<!-- 게시글 조회 -->
+	<select id="selectBoardServiceList" resultType="com.jeon.Portfolio.board.service.BoardVO">
+		SELECT *
+		
+		FROM BOARD
+	</select>
+	
+	<!--  게시글 작성  -->
+    <insert id="insertBoardServiceList" parameterType="com.jeon.Portfolio.board.service.BoardVO">
+        INSERT INTO
+        BOARD (board_no, board_title, board_content, user_id, board_regdate, board_cnt)
+        VALUES (seq_board_no.nextval, #{board_title}, #{board_content}, #{user_id}, to_char(sysdate,'yyyy.mm.dd'), 0)
+
+    </insert>
+    
+    <!--  게시글 상세  -->
+	<select id="boardDetail" parameterType="int" resultType="com.jeon.Portfolio.board.service.BoardVO">
+		SELECT
+		*
+		FROM BOARD
+		WHERE
+		BOARD_NO = #{board_no}
+    </select>
+    
+    <!-- 조회수 갱신 -->
+	<update id="updateViewCnt" parameterType="int">
+		UPDATE BOARD
+		SET
+		BOARD_CNT = NVL(BOARD_CNT, 0) + 1
+		WHERE
+		BOARD_NO = ${board_no}
+	</update>
+	
+	<!--  게시글 수정  -->
+    <update id="boardUpdate" parameterType="map">
+        UPDATE BOARD
+        SET
+
+            BOARD_TITLE = #{board_title},
+            BOARD_CONTENT = #{board_content}
+    
+        WHERE BOARD_NO = #{board_no}
+    </update>
+    
+    <!--  게시글 삭제  -->
+    <delete id="boardDelete" parameterType="int">
+    	DELETE FROM BOARD WHERE BOARD_NO = #{board_no}
+    </delete>
+  
+</mapper>

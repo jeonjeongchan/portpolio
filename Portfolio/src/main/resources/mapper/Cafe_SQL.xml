@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeon.Portfolio.cafe.service.impl.CafeMapper">
+
+	<!-- 메뉴 리스트1 -->
+	<select id="selectMenuServiceList1" resultType="com.jeon.Portfolio.cafe.service.CafeVO">
+		SELECT * FROM CAFE.MENU
+		WHERE
+		menu_type = '1'
+	</select>
+	
+	<!-- 메뉴 리스트2 -->
+	<select id="selectMenuServiceList2" resultType="com.jeon.Portfolio.cafe.service.CafeVO">
+		SELECT * FROM CAFE.MENU
+		WHERE
+		menu_type = '2'
+	</select>
+	
+	<!-- 메뉴 리스트3 -->
+	<select id="selectMenuServiceList3" resultType="com.jeon.Portfolio.cafe.service.CafeVO">
+		SELECT * FROM CAFE.MENU
+		WHERE
+		menu_type = '3'
+	</select>
+	
+	<!-- 상세 메뉴  -->
+	<select id="selectMenuDetailServiceList" parameterType="int" resultType="com.jeon.Portfolio.cafe.service.CafeVO">
+		SELECT
+		*
+		FROM CAFE.MENU
+		WHERE
+		menu_no = #{menu_no}
+	</select>
+	
+	<!-- 메뉴 추가 -->
+    <insert id="insertMenuList" parameterType="com.jeon.Portfolio.cafe.service.CafeVO">
+        INSERT INTO
+        "CAFE"."MENU" (MENU_NO, MENU_NAME, MENU_PRICE, MENU_PHOTO, MENU_INFO, MENU_TYPE)
+        VALUES (menu_seq.nextval,#{menu_name},#{menu_price}, #{menu_photo}, #{menu_info}, #{menu_type}
+        )
+        
+    </insert>
+    
+    <!-- 메뉴 삭제  -->
+    <delete id="menuDelete" parameterType="int">
+    	DELETE FROM CAFE.MENU WHERE MENU_NO = #{menu_no}
+    </delete>
+    
+    <!-- 메뉴 수정  -->
+    <update id="menuDetailUpdate" parameterType="com.jeon.Portfolio.board.service.BoardVO">
+        UPDATE CAFE.MENU
+        SET
+        	 menu_name = #{menu_name}
+        	,menu_price = #{menu_price}
+        	,menu_photo = #{menu_photo}
+        	,menu_info = #{menu_info}
+        	,menu_type = #{menu_type}
+			
+        WHERE MENU_NO = #{menu_no}
+    </update>
+
+	<!-- 베스트 셀러 -->
+	<select id="selectBestSellerList" resultType="com.jeon.Portfolio.cafe.service.CafeVO">
+		select *
+
+		from menu
+
+		where MENU_NAME = '아메리카노'
+		or MENU_NAME = '카페라떼'
+		or MENU_NAME = '생강차'
+		or MENU_NAME = '바닐라라떼'
+	</select>
+
+    
+</mapper>

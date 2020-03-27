@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeon.Portfolio.order.service.impl.OrderMapper">
+	
+    <!-- 주문 목록-->
+	<select id="orderList" resultType="com.jeon.Portfolio.order.service.OrderVO">
+		SELECT *
+
+		FROM cafeorder
+		WHERE user_id = #{user_id}
+			AND ORDERYN = 'Y'
+		order by order_no desc
+		
+    </select>
+    
+    <!-- 주문 금액 -->
+	<select id="money" parameterType="com.jeon.Portfolio.order.service.OrderVO" resultType="int">
+		SELECT NVL(SUM(menu_price * order_count), 0) money
+		FROM CAFEORDERMENU om, MENU m
+		WHERE om.menu_no = m.menu_no
+		AND om.user_id =  #{user_id}
+        AND om.order_no = #{order_no}
+    </select>
+    
+    
+    <!-- 주문 상세 현황 -->
+	<select id="orderDetail" parameterType="int" resultType="com.jeon.Portfolio.order.service.OrderVO">
+		SELECT
+			m.menu_name,
+			om.order_count,
+			om.order_menu_price,
+			m.menu_price,	
+			m.menu_photo
+		FROM
+			CAFEUSER u, MENU m, CAFEORDERMENU om
+		WHERE u.user_id = om.user_id
+   			AND m.menu_no = om.menu_no
+            and om.order_no = #{order_no}
+    	ORDER BY
+    		om.order_no 
+    </select>
+    
+        <!-- 주문 상세 현황 -->
+	<select id="orderSumMoney" parameterType="int" resultType="int">
+		SELECT SUM
+		    (order_menu_price)
+		FROM cafeordermenu
+		WHERE order_no = #{order_no}
+    </select>
+    
+    <update id="orderMenuDelete" parameterType="com.jeon.Portfolio.order.service.OrderVO">
+    	UPDATE CAFEORDERMENU SET orderyn = 'N'
+    	WHERE order_no = #{order_no}
+    </update>
+    
+    <update id="orderDelete" parameterType="com.jeon.Portfolio.order.service.OrderVO">
+    	UPDATE CAFEORDER SET orderyn = 'N'
+    	WHERE order_no = #{order_no}
+    </update>
+</mapper>

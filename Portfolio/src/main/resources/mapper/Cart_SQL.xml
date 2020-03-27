@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeon.Portfolio.cart.service.impl.CartMapper">
+	
+	<!-- 장바구니 추가 -->
+    <insert id="cartInsert" parameterType="com.jeon.Portfolio.cart.service.CartVO">
+        INSERT INTO
+        "CAFE"."CART" (USER_ID, MENU_NO, CART_COUNT)
+        VALUES (#{user_id},#{menu_no}, #{cart_count})
+        
+    </insert>
+    
+    <!-- 장바구니 목록-->
+	<select id="cartList" resultType="com.jeon.Portfolio.cart.service.CartVO">
+		SELECT
+			c.user_id,
+			m.menu_no,
+			u.user_name,
+			m.menu_name,
+			m.menu_photo,
+			c.cart_count,
+			m.menu_price,
+			(menu_price * cart_count) money			
+		FROM
+			CAFEUSER u, MENU m, CART c
+		WHERE u.user_id = c.user_id
+   			AND m.menu_no = c.menu_no
+   			AND c.user_id = #{user_id}
+    	ORDER BY
+    		c.user_id
+    </select>
+    
+    <!-- 수량 -->
+	<select id="cartCount" resultType="int">
+		SELECT COUNT(*)
+		FROM CART
+		WHERE USER_ID = #{user_id}
+		AND MENU_NO = #{menu_no}
+    </select>
+   
+    <!-- 장바구니 금액 -->
+	<select id="money" parameterType="com.jeon.Portfolio.cart.service.CartVO" resultType="int">
+		SELECT NVL(SUM(menu_price * cart_count), 0) money
+		FROM cart c, menu m
+		WHERE c.menu_no = m.menu_no
+		AND c.user_id = #{user_id}
+    </select>
+    
+    <!-- 동일한 메뉴 존재시 수정 -->
+	<update id="cartUpdate">
+		UPDATE CART
+		SET cart_count = cart_count + #{cart_count}
+		WHERE user_id = #{user_id}
+		AND menu_no = #{menu_no}
+    </update>
+    
+    <!-- 장바구니 삭제 -->
+	<delete id="cartDelete" parameterType="com.jeon.Portfolio.cart.service.CartVO">
+		DELETE FROM CART
+		WHERE user_id = #{user_id}
+		AND MENU_NO = #{menu_no}
+    </delete>
+    
+    <!-- 장바구니 모두 삭제 -->
+	<delete id="cartAllDelete" parameterType="string">
+		DELETE FROM CART
+		WHERE user_id = #{user_id}
+    </delete>
+    
+    <insert id="cartOrderInsert" parameterType="com.jeon.Portfolio.cart.service.CartVO">
+        INSERT INTO
+        "CAFE"."CAFEORDER" (order_no, order_sum_money, order_date, user_id, orderyn)
+        VALUES (order_seq.nextval, #{order_sum_money}, to_char(sysdate,'yyyy.mm.dd'), #{user_id}, 'Y')
+    </insert>
+    
+     <insert id="cartOrderMenuInsert" parameterType="map">
+       
+      INSERT INTO 
+    	"CAFE"."CAFEORDERMENU" (order_menu_no, order_no, menu_no, user_id, order_count, order_date, order_menu_price, orderyn)
+		SELECT 
+   		 order_menu_seq.nextval, (SELECT ORDER_NO FROM(SELECT ORDER_NO FROM CAFEORDER ORDER BY ROWNUM DESC) WHERE ROWNUM = 1),
+   		  menu_no, user_id, cart_count, TO_CHAR(SYSDATE,'YYYY-MM-DD'), (select (menu_price * cart_count)
+																			from menu
+																			where menu_no = #{menu_no}), 'Y'
+		FROM 
+    	"CAFE"."CART"
+		WHERE 
+         user_id = #{user_id}
+         AND menu_no = #{menu_no}
+    </insert>
+    
+    <!-- 물건 번호 -->
+	<select id="cartMenuNo" parameterType="String" resultType="int">
+		select menu_no
+		from cart
+		where user_id = #{user_id}
+    </select>
+		
+</mapper>
